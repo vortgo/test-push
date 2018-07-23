@@ -8,16 +8,23 @@
 <h1>My First Heading</h1>
 <p>My first paragraph.</p>
 
+<script
+        src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
 
 <script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
 <script>
-  var OneSignal = window.OneSignal || [];
-  OneSignal.push(function() {
-    OneSignal.init({
-      appId: "33beb8cf-de2e-4041-9c3c-9cd704eddeef",
+    var OneSignal = window.OneSignal || [];
+    OneSignal.push(function () {
+        OneSignal.init({
+            appId: "33beb8cf-de2e-4041-9c3c-9cd704eddeef",
+            autoRegister: false,
+        });
     });
-  });
 </script>
+
+<script></script>
 
 </body>
 </html>
