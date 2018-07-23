@@ -1,119 +1,55 @@
-<!DOCTYPE html>
 <html>
-<head>
-    <title>Page Title</title>
-</head>
-<!--<body>-->
-
-<!--<h1>My First Heading</h1>-->
-<!--<p>My first paragraph.</p>-->
-
-<!--<script-->
-        <!--src="https://code.jquery.com/jquery-3.3.1.min.js"-->
-        <!--integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="-->
-        <!--crossorigin="anonymous"></script>-->
-
-<!--<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>-->
-<!--<script>-->
-    <!--var OneSignal = window.OneSignal || [];-->
-    <!--OneSignal.push(function () {-->
-        <!--OneSignal.init({-->
-            <!--appId: "33beb8cf-de2e-4041-9c3c-9cd704eddeef",-->
-            <!--autoRegister: false,-->
-        <!--});-->
-        <!--OneSignal.registerForPushNotifications();-->
-    <!--});-->
-<!--</script>-->
-
-<!--<script></script>-->
-
-<!--</body>-->
-
-
+<title>Firebase Messaging Demo</title>
+<style>
+    div {
+        margin-bottom: 15px;
+    }
+</style>
 <body>
-<a href="#" id="my-notification-button" style="display: none;">Subscribe to Notifications</a>
-<script src="https://cdn.onesignal.com/sdks/OneSignalSDK.js" async=""></script>
+<div id="token"></div>
+<div id="msg"></div>
+<div id="notis"></div>
+<div id="err"></div>
+<script src="https://www.gstatic.com/firebasejs/4.6.2/firebase.js"></script>
 <script>
-    function onManageWebPushSubscriptionButtonClicked(event) {
-        getSubscriptionState().then(function(state) {
-            if (state.isPushEnabled) {
-                /* Subscribed, opt them out */
-                OneSignal.setSubscription(false);
-            } else {
-                if (state.isOptedOut) {
-                    /* Opted out, opt them back in */
-                    OneSignal.setSubscription(true);
-                } else {
-                    /* Unsubscribed, subscribe them */
-                    OneSignal.registerForPushNotifications();
-                }
-            }
+    MsgElem = document.getElementById("msg")
+    TokenElem = document.getElementById("token")
+    NotisElem = document.getElementById("notis")
+    ErrElem = document.getElementById("err")
+    // Initialize Firebase
+    // TODO: Replace with your project's customized code snippet
+    var config = {
+        apiKey: "<API_KEY>",
+        authDomain: "<PROJECT_ID>.firebaseapp.com",
+        databaseURL: "https://<DATABASE_NAME>.firebaseio.com",
+        storageBucket: "<BUCKET>.appspot.com",
+        messagingSenderId: "<SENDER_ID>",
+    };
+    firebase.initializeApp(config);
+    const messaging = firebase.messaging();
+    messaging
+        .requestPermission()
+        .then(function () {
+            MsgElem.innerHTML = "Notification permission granted."
+            console.log("Notification permission granted.");
+
+            // get the token in the form of promise
+            return messaging.getToken()
+        })
+        .then(function(token) {
+            TokenElem.innerHTML = "token is : " + token
+        })
+        .catch(function (err) {
+            ErrElem.innerHTML =  ErrElem.innerHTML + "; " + err
+            console.log("Unable to get permission to notify.", err);
         });
-        event.preventDefault();
-    }
-
-    function updateMangeWebPushSubscriptionButton(buttonSelector) {
-        var hideWhenSubscribed = false;
-        var subscribeText = "Subscribe to Notifications";
-        var unsubscribeText = "Unsubscribe from Notifications";
-
-        getSubscriptionState().then(function(state) {
-            var buttonText = !state.isPushEnabled || state.isOptedOut ? subscribeText : unsubscribeText;
-
-            var element = document.querySelector(buttonSelector);
-            if (element === null) {
-                return;
-            }
-
-            element.removeEventListener('click', onManageWebPushSubscriptionButtonClicked);
-            element.addEventListener('click', onManageWebPushSubscriptionButtonClicked);
-            element.textContent = buttonText;
-
-            if (state.hideWhenSubscribed && state.isPushEnabled) {
-                element.style.display = "none";
-            } else {
-                element.style.display = "";
-            }
-        });
-    }
-
-    function getSubscriptionState() {
-        return Promise.all([
-            OneSignal.isPushNotificationsEnabled(),
-            OneSignal.isOptedOut()
-        ]).then(function(result) {
-            var isPushEnabled = result[0];
-            var isOptedOut = result[1];
-
-            return {
-                isPushEnabled: isPushEnabled,
-                isOptedOut: isOptedOut
-            };
-        });
-    }
-
-    var OneSignal = OneSignal || [];
-    var buttonSelector = "#my-notification-button";
-
-    OneSignal.push(function () {
-        OneSignal.init({
-            appId: "33beb8cf-de2e-4041-9c3c-9cd704eddeef",
-            autoRegister: false,
-        });
-    });
-
-    /* This example assumes you've already initialized OneSignal */
-    OneSignal.push(function() {
-        // If we're on an unsupported browser, do nothing
-        if (!OneSignal.isPushNotificationsSupported()) {
-            return;
-        }
-        updateMangeWebPushSubscriptionButton(buttonSelector);
-        OneSignal.on("subscriptionChange", function(isSubscribed) {
-            /* If the user's subscription state changes during the page's session, update the button text */
-            updateMangeWebPushSubscriptionButton(buttonSelector);
-        });
+    messaging.onMessage(function(payload) {
+        console.log("Message received. ", payload);
+        NotisElem.innerHTML = NotisElem.innerHTML + JSON.stringify(payload)
     });
 </script>
+
+<body>
 </body>
+
 </html>
