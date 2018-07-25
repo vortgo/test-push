@@ -41,10 +41,12 @@
 
     function getToken() {
         messaging.getToken().then(function (gotToken) {
-            token = gotToken;
-            console.log('Token ' + gotToken);
-            sendTokenToServer(token);
-            $('#sendPush').hide();
+            if(gotToken){
+                token = gotToken;
+                console.log('Token ' + gotToken);
+                sendTokenToServer(token);
+                $('#sendPush').hide();
+            }
         }).catch(function (err) {
             console.log('Unable to retrieve token ', err);
             $('#sendPush').show();
