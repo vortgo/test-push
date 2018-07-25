@@ -26,36 +26,52 @@
     var messaging = firebase.messaging();
     var token;
 
-    $(document).on('click', '#sendPush', function(){
-        if($(this).prop('checked')){
-            messaging.requestPermission().then(function(){
+    $(document).ready(function () {
+        getToken();
+    }).on('click', '#sendPush', function () {
+        if ($(this).prop('checked')) {
+            messaging.requestPermission().then(function () {
                 console.log('permission requested');
-            }).catch(function(err){
+                getToken();
+            }).catch(function (err) {
                 $(this).prop('checked', false);
                 console.log('Error occurred while requesting permission: ' + err);
+                return false;
             });
-        }else{
-            messaging.deleteToken(token).then(function(){
+        } else {
+            messaging.deleteToken(token).then(function () {
                 console.log('Token delete successfully');
-            }).catch(function(err){
+            }).catch(function (err) {
                 console.log('Error occurred while deleting token: ' + err);
             });
         }
     });
 
-    messaging.onTokenRefresh(function() {
-        messaging.getToken().then(function(refreshedToken) {
+    messaging.onTokenRefresh(function () {
+        messaging.getToken().then(function (refreshedToken) {
             token = refreshedToken;
             console.log('Token refreshed. ' + refreshedToken);
             sendTokenToServer(refreshedToken);
 
-        }).catch(function(err) {
+        }).catch(function (err) {
             console.log('Unable to retrieve refreshed token ', err);
 
         });
     });
 
-    function sendTokenToServer(token){
+    function getToken() {
+        messaging.getToken().then(function (gotToken) {
+            token = gotToken;
+            console.log('Token ' + gotToken);
+            sendTokenToServer(token);
+            $('#sendPush').prop('checked', true);
+        }).catch(function (err) {
+            console.log('Unable to retrieve token ', err);
+            $('#sendPush').prop('checked', false);
+        });
+    }
+
+    function sendTokenToServer(token) {
         console.log('Token sent to server: ' + token);
     }
 </script>
