@@ -24,17 +24,28 @@
     };
     firebase.initializeApp(config);
     var messaging = firebase.messaging();
+    var token;
 
     $(document).on('click', '#sendPush', function(){
         if($(this).prop('checked')){
-            console.log('checked');
+            messaging.requestPermission().then(function(){
+                console.log('permission requested');
+            }).catch(function(err){
+                $(this).prop('checked', false);
+                console.log('Error occurred while requesting permission: ' + err);
+            });
         }else{
-            console.log('not checked');
+            messaging.deleteToken(token).then(function(){
+                console.log('Token delete successfully');
+            }).catch(function(err){
+                console.log('Error occurred while deleting token: ' + err);
+            });
         }
     });
 
     messaging.onTokenRefresh(function() {
         messaging.getToken().then(function(refreshedToken) {
+            token = refreshedToken;
             console.log('Token refreshed. ' + refreshedToken);
             sendTokenToServer(refreshedToken);
 
