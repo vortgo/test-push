@@ -29,14 +29,7 @@
     $(document).ready(function () {
         getToken();
     }).on('click', '#sendPush', function () {
-        messaging.requestPermission().then(function () {
-            console.log('permission requested');
-            getToken();
-        }).catch(function (err) {
-            console.log('Error occurred while requesting permission: ' + err);
-            alert('Push disabled - more info');
-        });
-
+      requestPermission;
     });
 
     function getToken() {
@@ -55,6 +48,17 @@
 
     function sendTokenToServer(token) {
         console.log('Token sent to server: ' + token);
+    }
+
+    function requestPermission()
+    {
+        messaging.requestPermission().then(function () {
+            console.log('permission requested');
+            getToken();
+        }).catch(function (err) {
+            console.log('Error occurred while requesting permission: ' + err);
+            alert('Push disabled - more info');
+        });
     }
 </script>
 
