@@ -6,7 +6,7 @@
     }
 </style>
 <body>
-<input id="sendPush" type="checkbox">
+<button id="sendPush"> Enable push</button>
 <script src="https://www.gstatic.com/firebasejs/5.3.0/firebase.js"></script>
 <script
         src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -29,34 +29,14 @@
     $(document).ready(function () {
         getToken();
     }).on('click', '#sendPush', function () {
-        if ($(this).prop('checked')) {
-            messaging.requestPermission().then(function () {
-                console.log('permission requested');
-                getToken();
-            }).catch(function (err) {
-                $(this).prop('checked', false);
-                console.log('Error occurred while requesting permission: ' + err);
-                return false;
-            });
-        } else {
-            messaging.deleteToken(token).then(function () {
-                console.log('Token delete successfully');
-            }).catch(function (err) {
-                console.log('Error occurred while deleting token: ' + err);
-            });
-        }
-    });
-
-    messaging.onTokenRefresh(function () {
-        messaging.getToken().then(function (refreshedToken) {
-            token = refreshedToken;
-            console.log('Token refreshed. ' + refreshedToken);
-            sendTokenToServer(refreshedToken);
-
+        messaging.requestPermission().then(function () {
+            console.log('permission requested');
+            getToken();
         }).catch(function (err) {
-            console.log('Unable to retrieve refreshed token ', err);
-
+            console.log('Error occurred while requesting permission: ' + err);
+            alert('Push disabled - more info');
         });
+
     });
 
     function getToken() {
@@ -64,10 +44,10 @@
             token = gotToken;
             console.log('Token ' + gotToken);
             sendTokenToServer(token);
-            $('#sendPush').prop('checked', true);
+            $('#sendPush').hide();
         }).catch(function (err) {
             console.log('Unable to retrieve token ', err);
-            $('#sendPush').prop('checked', false);
+            $('#sendPush').show();
         });
     }
 
